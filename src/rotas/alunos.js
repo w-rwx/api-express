@@ -4,6 +4,7 @@ import * as controlador from '../controlador/aluno-controlador.js'
 const router = Router()
 
 router.get('/alunos', controlador.listar)
+router.get('/alunos/:id', controlador.buscarPorId)
 router.post('/alunos', controlador.criar)
 router.put('/alunos/:id', controlador.editar)
 router.delete('/alunos/:id', controlador.deletar)

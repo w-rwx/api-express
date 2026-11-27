@@ -1,8 +1,8 @@
 import banco from '../dados/db.js'
 import tratarErro from './erros.js'
 
-const listar = tratarErro('listar alunos')(async (pedido, resposta) => {
-    const { rows } = await banco.query(`
+// Consulta base com os dados relacionados; `filtro` permite restringir (ex.: por id)
+const consulta = (filtro = '') => `
         SELECT a.*,
             COALESCE(
                 json_agg(DISTINCT jsonb_build_object(
@@ -30,10 +30,25 @@ const listar = tratarErro('listar alunos')(async (pedido, resposta) => {
         LEFT JOIN turmas t ON t.id = ta.turma_id
         LEFT JOIN disciplinas d ON d.id = t.disciplina_id
         LEFT JOIN professores p ON p.id = t.professor_id
+        ${filtro}
         GROUP BY a.id
         ORDER BY a.id
-    `)
+`
+
+const listar = tratarErro('listar alunos')(async (pedido, resposta) => {
+    const { rows } = await banco.query(consulta())
     resposta.json(rows)
+})
+
+const buscarPorId = tratarErro('buscar aluno')(async (pedido, resposta) => {
+    const { id } = pedido.params
+    const { rows } = await banco.query(consulta('WHERE a.id = $1'), [id])
+
+    if (rows.length === 0) {
+        return resposta.status(404).json({ mensagem: 'Aluno não encontrado!' })
+    }
+
+    resposta.json(rows[0])
 })
 
 const criar = tratarErro('criar aluno')(async (pedido, resposta) => {
@@ -72,4 +87,4 @@ const deletar = tratarErro('deletar aluno')(async (pedido, resposta) => {
     resposta.json({ mensagem: 'Aluno deletado com sucesso!' })
 })
 
-export { listar, criar, editar, deletar }
+export { listar, buscarPorId, criar, editar, deletar }

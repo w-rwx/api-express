@@ -125,6 +125,7 @@ const swaggerDocument = {
         },
         '/alunos/{id}': {
             parameters: [{ $ref: '#/components/parameters/Id' }],
+            get: { tags: ['Alunos'], summary: 'Busca um aluno pelo id', responses: { 200: { description: 'Aluno encontrado.' }, 400: { $ref: '#/components/responses/BadRequest' }, 404: { $ref: '#/components/responses/NotFound' } } },
             put: {
                 tags: ['Alunos'],
                 summary: 'Edita um aluno',
@@ -148,6 +149,7 @@ const swaggerDocument = {
         },
         '/cursos/{id}': {
             parameters: [{ $ref: '#/components/parameters/Id' }],
+            get: { tags: ['Cursos'], summary: 'Busca um curso pelo id', responses: { 200: { description: 'Curso encontrado.' }, 400: { $ref: '#/components/responses/BadRequest' }, 404: { $ref: '#/components/responses/NotFound' } } },
             put: {
                 tags: ['Cursos'],
                 summary: 'Edita um curso',
@@ -211,6 +213,7 @@ const swaggerDocument = {
         },
         '/disciplinas/{id}': {
             parameters: [{ $ref: '#/components/parameters/Id' }],
+            get: { tags: ['Disciplinas'], summary: 'Busca uma disciplina pelo id', responses: { 200: { description: 'Disciplina encontrada.' }, 400: { $ref: '#/components/responses/BadRequest' }, 404: { $ref: '#/components/responses/NotFound' } } },
             put: { tags: ['Disciplinas'], summary: 'Edita uma disciplina', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/Disciplina' } } } }, responses: { 200: { description: 'Disciplina editada.' }, 404: { $ref: '#/components/responses/NotFound' } } },
             delete: { tags: ['Disciplinas'], summary: 'Remove uma disciplina', responses: { 200: { description: 'Disciplina removida.' }, 404: { $ref: '#/components/responses/NotFound' } } },
         },
@@ -220,6 +223,7 @@ const swaggerDocument = {
         },
         '/professores/{id}': {
             parameters: [{ $ref: '#/components/parameters/Id' }],
+            get: { tags: ['Professores'], summary: 'Busca um professor pelo id', responses: { 200: { description: 'Professor encontrado.' }, 400: { $ref: '#/components/responses/BadRequest' }, 404: { $ref: '#/components/responses/NotFound' } } },
             put: { tags: ['Professores'], summary: 'Edita um professor', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/Professor' } } } }, responses: { 200: { description: 'Professor editado.' }, 404: { $ref: '#/components/responses/NotFound' } } },
             delete: { tags: ['Professores'], summary: 'Remove um professor', responses: { 200: { description: 'Professor removido.' }, 404: { $ref: '#/components/responses/NotFound' } } },
         },
@@ -229,6 +233,7 @@ const swaggerDocument = {
         },
         '/turmas/{id}': {
             parameters: [{ $ref: '#/components/parameters/Id' }],
+            get: { tags: ['Turmas'], summary: 'Busca uma turma pelo id', responses: { 200: { description: 'Turma encontrada.' }, 400: { $ref: '#/components/responses/BadRequest' }, 404: { $ref: '#/components/responses/NotFound' } } },
             put: { tags: ['Turmas'], summary: 'Edita uma turma', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/Turma' } } } }, responses: { 200: { description: 'Turma editada.' }, 404: { $ref: '#/components/responses/NotFound' } } },
             delete: { tags: ['Turmas'], summary: 'Remove uma turma', responses: { 200: { description: 'Turma removida.' }, 404: { $ref: '#/components/responses/NotFound' } } },
         },

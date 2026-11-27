@@ -1,8 +1,8 @@
 import conexao from '../dados/db.js'
 import tratarErro from './erros.js'
 
-const listar = tratarErro('listar turmas')(async (pedido, resposta) => {
-    const { rows } = await conexao.query(`
+// Consulta base com os dados relacionados; `filtro` permite restringir (ex.: por id)
+const consulta = (filtro = '') => `
         SELECT t.*,
             json_build_object(
                 'id', p.id,
@@ -25,10 +25,25 @@ const listar = tratarErro('listar turmas')(async (pedido, resposta) => {
         JOIN professores p ON p.id = t.professor_id
         LEFT JOIN turma_alunos ta ON ta.turma_id = t.id
         LEFT JOIN alunos a ON a.id = ta.aluno_id
+        ${filtro}
         GROUP BY t.id, p.id
         ORDER BY t.id
-    `)
+`
+
+const listar = tratarErro('listar turmas')(async (pedido, resposta) => {
+    const { rows } = await conexao.query(consulta())
     resposta.json(rows)
+})
+
+const buscarPorId = tratarErro('buscar turma')(async (pedido, resposta) => {
+    const { id } = pedido.params
+    const { rows } = await conexao.query(consulta('WHERE t.id = $1'), [id])
+
+    if (rows.length === 0) {
+        return resposta.status(404).json({ mensagem: 'Turma não encontrada!' })
+    }
+
+    resposta.json(rows[0])
 })
 
 const criar = tratarErro('criar turma')(async (pedido, resposta) => {
@@ -68,4 +83,4 @@ const deletar = tratarErro('deletar turma')(async (pedido, resposta) => {
     resposta.json({ mensagem: 'Turma deletada com sucesso!' })
 })
 
-export { listar, criar, editar, deletar }
+export { listar, buscarPorId, criar, editar, deletar }
