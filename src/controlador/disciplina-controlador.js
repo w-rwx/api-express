@@ -1,8 +1,8 @@
 import banco from '../dados/db.js'
 import tratarErro from './erros.js'
 
-const listar = tratarErro('listar disciplinas')(async (pedido, resposta) => {
-    const { rows } = await banco.query(`
+// Consulta base com os dados relacionados; `filtro` permite restringir (ex.: por id)
+const consulta = (filtro = '') => `
         SELECT d.*,
             COALESCE(
                 json_agg(json_build_object(
@@ -15,10 +15,25 @@ const listar = tratarErro('listar disciplinas')(async (pedido, resposta) => {
         FROM disciplinas d
         LEFT JOIN curso_disciplinas cd ON cd.disciplina_id = d.id
         LEFT JOIN cursos c ON c.id = cd.curso_id
+        ${filtro}
         GROUP BY d.id
         ORDER BY d.id
-    `)
+`
+
+const listar = tratarErro('listar disciplinas')(async (pedido, resposta) => {
+    const { rows } = await banco.query(consulta())
     resposta.json(rows)
+})
+
+const buscarPorId = tratarErro('buscar disciplina')(async (pedido, resposta) => {
+    const { id } = pedido.params
+    const { rows } = await banco.query(consulta('WHERE d.id = $1'), [id])
+
+    if (rows.length === 0) {
+        return resposta.status(404).json({ mensagem: 'disciplina não encontrada!' })
+    }
+
+    resposta.json(rows[0])
 })
 
 const criar = tratarErro('criar disciplina')(async (pedido, resposta) => {
@@ -57,4 +72,4 @@ const deletar = tratarErro('deletar disciplina')(async (pedido, resposta) => {
     resposta.json({ mensagem: 'disciplina deletada com sucesso!' })
 })
 
-export { listar, criar, editar, deletar }
+export { listar, buscarPorId, criar, editar, deletar }

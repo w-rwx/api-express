@@ -16,6 +16,10 @@ const tratarErro = (acao) => (handler) => async (pedido, resposta, next) => {
             return resposta.status(400).json({ mensagem: 'Referência inválida.' })
         }
 
+        if (erro?.code === '22P02') {
+            return resposta.status(400).json({ mensagem: 'Valor inválido informado.' })
+        }
+
         if (erro?.code === '23502') {
             return resposta.status(400).json({ mensagem: 'Campo obrigatório não informado.' })
         }

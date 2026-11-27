@@ -1,8 +1,8 @@
 import banco from '../dados/db.js'
 import tratarErro from './erros.js'
 
-const listar = tratarErro('listar cursos')(async (pedido, resposta) => {
-    const { rows } = await banco.query(`
+// Consulta base com os dados relacionados; `filtro` permite restringir (ex.: por id)
+const consulta = (filtro = '') => `
         SELECT c.*,
             COALESCE((
                 SELECT json_agg(json_build_object(
@@ -27,9 +27,24 @@ const listar = tratarErro('listar cursos')(async (pedido, resposta) => {
                 WHERE ac.curso_id = c.id
             ), '[]') AS alunos
         FROM cursos c
+        ${filtro}
         ORDER BY c.id
-    `)
+`
+
+const listar = tratarErro('listar cursos')(async (pedido, resposta) => {
+    const { rows } = await banco.query(consulta())
     resposta.json(rows)
+})
+
+const buscarPorId = tratarErro('buscar curso')(async (pedido, resposta) => {
+    const { id } = pedido.params
+    const { rows } = await banco.query(consulta('WHERE c.id = $1'), [id])
+
+    if (rows.length === 0) {
+        return resposta.status(404).json({ mensagem: 'Curso não encontrado!' })
+    }
+
+    resposta.json(rows[0])
 })
 
 const criar = tratarErro('criar curso')(async (pedido, resposta) => {
@@ -127,6 +142,7 @@ const removerAluno = tratarErro('remover aluno do curso')(async (pedido, respost
 
 export {
     listar,
+    buscarPorId,
     criar,
     editar,
     deletar,
